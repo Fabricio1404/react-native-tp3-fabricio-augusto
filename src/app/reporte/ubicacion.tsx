@@ -1,9 +1,11 @@
 import { router } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { Boton, Chip, Opciones, Pantalla, Tarjeta } from '@/components/ui';
+import { Boton, Chip, Insignia, Opciones, Pantalla, Tarjeta, TituloSeccion } from '@/components/ui';
+import { SECTOR_EMOJI } from '@/constants/iconos';
+import { Marca, Spacing } from '@/constants/theme';
 import { useConPermiso } from '@/hooks/useConPermiso';
 import { SECTORES, editarBorrador, useStore } from '@/lib/store';
 import { describirUbicacion, obtenerUbicacion } from '@/lib/ubicacion';
@@ -32,37 +34,48 @@ export default function UbicacionReporte() {
   return (
     <Pantalla>
       <Tarjeta>
-        <ThemedText type="smallBold">Ubicación actual</ThemedText>
-        {buscando ? (
-          <ActivityIndicator />
-        ) : ubicacion ? (
-          <>
-            <ThemedText>{describirUbicacion(ubicacion)}</ThemedText>
-            {ubicacion.aproximada && <Chip texto="parcial" />}
-          </>
-        ) : (
-          <ThemedText type="small" themeColor="textSecondary">
-            {fallo ? 'No pudimos obtener la ubicación. Elegí el sector abajo.' : 'Sin marcar'}
-          </ThemedText>
-        )}
-        <Boton titulo="Usar mi ubicación actual" onPress={permiso.ejecutar} deshabilitado={buscando} />
+        <View style={styles.fila}>
+          <Insignia emoji="📍" color={ubicacion ? Marca.verde : Marca.azulClaro} />
+          <View style={{ flex: 1, gap: 4 }}>
+            <ThemedText type="smallBold">Ubicación actual</ThemedText>
+            {buscando ? (
+              <ActivityIndicator style={{ alignSelf: 'flex-start' }} />
+            ) : ubicacion ? (
+              <>
+                <ThemedText>{describirUbicacion(ubicacion)}</ThemedText>
+                {ubicacion.aproximada && <Chip texto="parcial" />}
+              </>
+            ) : (
+              <ThemedText type="small" themeColor="textSecondary">
+                {fallo ? 'No pudimos obtenerla. Elegí el sector abajo.' : 'Sin marcar'}
+              </ThemedText>
+            )}
+          </View>
+        </View>
+        <Boton titulo="Usar mi ubicación actual" icono="🛰️" onPress={permiso.ejecutar} deshabilitado={buscando} />
         {ubicacion && (
-          <Boton
-            titulo="Quitar ubicación"
-            variante="secundario"
-            onPress={() => editarBorrador({ ubicacion: null })}
-          />
+          <Boton titulo="Quitar ubicación" variante="secundario" onPress={() => editarBorrador({ ubicacion: null })} />
         )}
       </Tarjeta>
 
-      <Tarjeta>
-        <ThemedText type="smallBold">
-          {sinPermiso ? 'Elegí el sector a mano' : 'Sector (también podés elegirlo a mano)'}
-        </ThemedText>
-        <Opciones opciones={SECTORES} valor={sector} onChange={(s) => editarBorrador({ sector: s })} />
+      <Tarjeta style={sinPermiso && { borderColor: Marca.ambar }}>
+        <TituloSeccion
+          icono="🧭"
+          titulo={sinPermiso ? 'Elegí el sector a mano' : 'O elegí el sector a mano'}
+        />
+        <Opciones
+          opciones={SECTORES}
+          iconos={SECTOR_EMOJI}
+          valor={sector}
+          onChange={(s) => editarBorrador({ sector: s })}
+        />
       </Tarjeta>
 
-      <Boton titulo="Listo" onPress={() => router.back()} />
+      <Boton titulo="Listo" icono="✅" variante="acento" onPress={() => router.back()} />
     </Pantalla>
   );
 }
+
+const styles = StyleSheet.create({
+  fila: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three },
+});

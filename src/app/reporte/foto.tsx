@@ -5,7 +5,7 @@ import { useCallback } from 'react';
 import { StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { Boton, Pantalla, Tarjeta } from '@/components/ui';
+import { Boton, Pantalla, Tarjeta, Vacio } from '@/components/ui';
 import { useConPermiso } from '@/hooks/useConPermiso';
 import { editarBorrador, useStore } from '@/lib/store';
 
@@ -32,27 +32,33 @@ export default function Foto() {
 
   return (
     <Pantalla>
-      <ThemedText type="subtitle">Foto del desperfecto</ThemedText>
       <Tarjeta>
         {fotoUri ? (
           <Image source={{ uri: fotoUri }} style={styles.foto} contentFit="cover" />
         ) : (
-          <ThemedText themeColor="textSecondary">Todavía no adjuntaste ninguna foto.</ThemedText>
+          <Vacio
+            emoji="📸"
+            titulo="Sin foto todavía"
+            texto="Sacá una foto del desperfecto o elegí una que ya tengas."
+          />
         )}
       </Tarjeta>
 
-      <Boton titulo="Sacar foto" onPress={camara.ejecutar} />
+      <Boton titulo="Sacar foto" icono="📷" onPress={camara.ejecutar} />
       {camara.estado === 'bloqueado' && (
         <ThemedText type="small" themeColor="textSecondary">
           La cámara está desactivada. Podés elegir una foto de la galería.
         </ThemedText>
       )}
-      <Boton titulo="Elegir de la galería" variante="secundario" onPress={elegirDeGaleria} />
+      <Boton titulo="Elegir de la galería" icono="🖼️" variante="secundario" onPress={elegirDeGaleria} />
+      <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center' }}>
+        🔒 Para elegir una foto no necesitamos acceso a tu galería.
+      </ThemedText>
 
       {fotoUri && (
         <>
-          <Boton titulo="Quitar foto" variante="secundario" onPress={() => editarBorrador({ fotoUri: null })} />
-          <Boton titulo="Listo" onPress={() => router.back()} />
+          <Boton titulo="Quitar foto" icono="🗑️" variante="secundario" onPress={() => editarBorrador({ fotoUri: null })} />
+          <Boton titulo="Listo" icono="✅" variante="acento" onPress={() => router.back()} />
         </>
       )}
     </Pantalla>

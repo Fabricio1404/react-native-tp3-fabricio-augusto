@@ -1,10 +1,12 @@
 import { Image } from 'expo-image';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { Boton, Chip, Pantalla, Tarjeta } from '@/components/ui';
+import { Boton, Chip, Insignia, Pantalla, Tarjeta, Vacio } from '@/components/ui';
+import { CATEGORIA_INFO } from '@/constants/iconos';
+import { Spacing } from '@/constants/theme';
 import { simularResolucion } from '@/lib/notificaciones';
 import { useStore } from '@/lib/store';
 import { describirUbicacion } from '@/lib/ubicacion';
@@ -19,14 +21,19 @@ export default function DetalleReporte() {
     return (
       <Pantalla>
         <Stack.Screen options={{ title: 'Reporte no encontrado' }} />
-        <ThemedText type="subtitle">No existe el reporte</ThemedText>
-        <ThemedText themeColor="textSecondary">
-          No encontramos ningún reporte con el id “{id}”. Puede que se haya borrado al reiniciar la app.
-        </ThemedText>
+        <Tarjeta>
+          <Vacio
+            emoji="🔎"
+            titulo="No existe el reporte"
+            texto={`No encontramos ningún reporte con el id “${id}”. Puede que se haya borrado al reiniciar la app.`}
+          />
+        </Tarjeta>
         <Boton titulo="Volver al inicio" onPress={() => router.replace('/')} />
       </Pantalla>
     );
   }
+
+  const cat = CATEGORIA_INFO[reporte.categoria];
 
   const simular = async () => {
     const conNotificacion = await simularResolucion(reporte.id);
@@ -39,29 +46,40 @@ export default function DetalleReporte() {
 
   return (
     <Pantalla>
-      <Stack.Screen options={{ title: reporte.titulo }} />
-      <Chip texto={reporte.estado} />
-      <ThemedText type="subtitle">{reporte.titulo}</ThemedText>
-      {!!reporte.descripcion && <ThemedText>{reporte.descripcion}</ThemedText>}
+      <Stack.Screen options={{ title: 'Detalle del reporte' }} />
+
+      <Tarjeta style={styles.cabecera}>
+        <Insignia emoji={cat.emoji} color={cat.color} tamano={64} />
+        <ThemedText type="subtitle" style={styles.centrado}>
+          {reporte.titulo}
+        </ThemedText>
+        <Chip texto={reporte.estado} style={{ alignSelf: 'center' }} />
+        {!!reporte.descripcion && (
+          <ThemedText themeColor="textSecondary" style={styles.centrado}>
+            {reporte.descripcion}
+          </ThemedText>
+        )}
+      </Tarjeta>
 
       <Tarjeta>
-        <Dato etiqueta="Categoría" valor={reporte.categoria} />
-        <Dato etiqueta="Aula" valor={reporte.aula || '—'} />
-        <Dato etiqueta="Ubicación" valor={reporte.ubicacion ? describirUbicacion(reporte.ubicacion) : '—'} />
-        <Dato etiqueta="Sector" valor={reporte.sector ?? '—'} />
-        <Dato etiqueta="Creado" valor={new Date(reporte.creado).toLocaleString()} />
+        <Dato icono="🏷️" etiqueta="Categoría" valor={reporte.categoria} />
+        <Dato icono="🏫" etiqueta="Aula" valor={reporte.aula || '—'} />
+        <Dato icono="📍" etiqueta="Ubicación" valor={reporte.ubicacion ? describirUbicacion(reporte.ubicacion) : '—'} />
+        <Dato icono="🧭" etiqueta="Sector" valor={reporte.sector ?? '—'} />
+        <Dato icono="🕒" etiqueta="Creado" valor={new Date(reporte.creado).toLocaleString()} />
       </Tarjeta>
 
       {reporte.fotoUri && <Image source={{ uri: reporte.fotoUri }} style={styles.foto} contentFit="cover" />}
 
       <Boton
         titulo="Simular resolución"
+        icono="🧪"
         variante="secundario"
         deshabilitado={reporte.estado !== 'pendiente'}
         onPress={simular}
       />
       {mensaje && (
-        <ThemedText type="small" themeColor="textSecondary">
+        <ThemedText type="small" themeColor="textSecondary" style={styles.centrado}>
           {mensaje}
         </ThemedText>
       )}
@@ -69,15 +87,25 @@ export default function DetalleReporte() {
   );
 }
 
-function Dato({ etiqueta, valor }: { etiqueta: string; valor: string }) {
+function Dato({ icono, etiqueta, valor }: { icono: string; etiqueta: string; valor: string }) {
   return (
-    <ThemedText type="small">
-      <ThemedText type="smallBold">{etiqueta}: </ThemedText>
-      {valor}
-    </ThemedText>
+    <View style={styles.dato}>
+      <Text style={styles.datoIcono}>{icono}</Text>
+      <ThemedText type="small" themeColor="textSecondary" style={styles.datoEtiqueta}>
+        {etiqueta}
+      </ThemedText>
+      <ThemedText type="smallBold" style={{ flex: 1, textAlign: 'right' }}>
+        {valor}
+      </ThemedText>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  foto: { width: '100%', height: 240, borderRadius: 16 },
+  cabecera: { alignItems: 'center', gap: Spacing.two, paddingVertical: Spacing.four },
+  centrado: { textAlign: 'center' },
+  foto: { width: '100%', height: 240, borderRadius: 18 },
+  dato: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two, paddingVertical: 6 },
+  datoIcono: { fontSize: 16 },
+  datoEtiqueta: { width: 80 },
 });

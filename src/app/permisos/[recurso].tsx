@@ -2,7 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 
 import { PantallaPrevia } from '@/components/PantallaPrevia';
 import { ThemedText } from '@/components/themed-text';
-import { Boton, Pantalla } from '@/components/ui';
+import { Boton, Pantalla, Tarjeta, Vacio } from '@/components/ui';
 import { usePermiso } from '@/hooks/usePermiso';
 import { FUENTES, esRecurso, type Recurso } from '@/lib/permisos';
 
@@ -32,8 +32,9 @@ function Contenido({ recurso }: { recurso: Recurso }) {
   if (estado === 'concedido') {
     return (
       <Pantalla>
-        <ThemedText type="subtitle">Permiso concedido</ThemedText>
-        <ThemedText themeColor="textSecondary">Ya podés usar esta función.</ThemedText>
+        <Tarjeta>
+          <Vacio emoji="✅" titulo="Permiso concedido" texto="Ya podés usar esta función." />
+        </Tarjeta>
         <Boton titulo="Continuar" onPress={() => router.back()} />
       </Pantalla>
     );

@@ -181,9 +181,13 @@ Salida de `npx expo prebuild --platform android --clean` → `android/app/src/ma
 
 Capturas de la versión web de la app (`npx expo start --web`) en tamaño de celular.
 
-| Inicio | Escáner: cargando | Escáner: preguntable | Escáner: concedido |
+| Inicio | Nuevo reporte | Escáner: cargando | Escáner: preguntable |
 |---|---|---|---|
-| ![](docs/capturas/inicio-con-reporte.png) | ![](docs/capturas/escaner-cargando.png) | ![](docs/capturas/escaner-preguntable.png) | ![](docs/capturas/escaner-concedido.png) |
+| ![](docs/capturas/inicio-con-reporte.png) | ![](docs/capturas/formulario.png) | ![](docs/capturas/escaner-cargando.png) | ![](docs/capturas/escaner-preguntable.png) |
+
+| Escáner: concedido | | | |
+|---|---|---|---|
+| ![](docs/capturas/escaner-concedido.png) | | | |
 
 | Pantalla previa (modal) | Ubicación concedida | Ubicación denegada → sector a mano | Foto desde el selector |
 |---|---|---|---|

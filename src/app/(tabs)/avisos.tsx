@@ -1,9 +1,10 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback } from 'react';
-import { Pressable } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { Pantalla, Tarjeta } from '@/components/ui';
+import { Insignia, Pantalla, Tarjeta, Vacio } from '@/components/ui';
+import { Marca, Spacing } from '@/constants/theme';
 import { marcarAvisosLeidos, useStore } from '@/lib/store';
 
 /**
@@ -19,32 +20,49 @@ export default function Avisos() {
     }, []),
   );
 
+  if (avisos.length === 0) {
+    return (
+      <Pantalla>
+        <Tarjeta>
+          <Vacio
+            emoji="📭"
+            titulo="No tenés avisos"
+            texto="Cuando se resuelva alguno de tus reportes, el aviso aparece acá, tengas o no activadas las notificaciones."
+          />
+        </Tarjeta>
+      </Pantalla>
+    );
+  }
+
   return (
     <Pantalla>
-      <ThemedText type="subtitle">Avisos</ThemedText>
-      {avisos.length === 0 ? (
-        <ThemedText themeColor="textSecondary">
-          Cuando se resuelva alguno de tus reportes, el aviso aparece acá, tengas o no activadas
-          las notificaciones.
-        </ThemedText>
-      ) : (
-        avisos.map((a) => (
-          <Pressable
-            key={a.id}
-            onPress={() => router.push({ pathname: '/reporte/[id]', params: { id: a.reporteId } })}>
-            <Tarjeta>
-              <ThemedText type="smallBold">
-                {a.leido ? '' : '● '}
-                {a.titulo}
-              </ThemedText>
+      {avisos.map((a) => (
+        <Pressable
+          key={a.id}
+          onPress={() => router.push({ pathname: '/reporte/[id]', params: { id: a.reporteId } })}>
+          <Tarjeta style={[styles.item, !a.leido && { borderColor: Marca.ambar }]}>
+            <Insignia emoji="✅" color={Marca.verde} />
+            <View style={{ flex: 1, gap: 2 }}>
+              <View style={styles.fila}>
+                <ThemedText type="smallBold" style={{ flex: 1 }}>
+                  {a.titulo}
+                </ThemedText>
+                {!a.leido && <View style={styles.nuevo} />}
+              </View>
               <ThemedText type="small">{a.cuerpo}</ThemedText>
               <ThemedText type="small" themeColor="textSecondary">
                 {new Date(a.fecha).toLocaleString()}
               </ThemedText>
-            </Tarjeta>
-          </Pressable>
-        ))
-      )}
+            </View>
+          </Tarjeta>
+        </Pressable>
+      ))}
     </Pantalla>
   );
 }
+
+const styles = StyleSheet.create({
+  item: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.three },
+  fila: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
+  nuevo: { width: 10, height: 10, borderRadius: 5, backgroundColor: Marca.ambar },
+});
