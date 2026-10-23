@@ -185,9 +185,9 @@ Capturas de la versión web de la app (`npx expo start --web`) en tamaño de cel
 |---|---|---|---|
 | ![](docs/capturas/inicio-con-reporte.png) | ![](docs/capturas/formulario.png) | ![](docs/capturas/escaner-cargando.png) | ![](docs/capturas/escaner-preguntable.png) |
 
-| Escáner: concedido | | | |
+| Escáner: concedido | Detalle del reporte | Ajustes de avisos | Modo oscuro |
 |---|---|---|---|
-| ![](docs/capturas/escaner-concedido.png) | | | |
+| ![](docs/capturas/escaner-concedido.png) | ![](docs/capturas/reporte-detalle.png) | ![](docs/capturas/ajustes-avisos.png) | ![](docs/capturas/inicio-oscuro.png) |
 
 | Pantalla previa (modal) | Ubicación concedida | Ubicación denegada → sector a mano | Foto desde el selector |
 |---|---|---|---|
