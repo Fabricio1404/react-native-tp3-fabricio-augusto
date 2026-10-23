@@ -181,19 +181,24 @@ Salida de `npx expo prebuild --platform android --clean` → `android/app/src/ma
 
 ## Capturas
 
-> Pendiente: agregar en `docs/capturas/`.
+> Estas capturas son de la **versión web** de la app (`npx expo start --web`), abierta en el navegador con tamaño de celular. Muestran las mismas pantallas y la misma lógica de permisos, pero los permisos los maneja el navegador:
+> - La cámara es la cámara de prueba del navegador.
+> - En "cargando" se demoró la consulta del permiso para que se llegue a ver.
+> - El "después de Ajustes" se simuló cambiando el permiso y haciendo que la app pase a segundo plano y vuelva.
+>
+> **Faltan, y se sacan en el celular:** escáner **bloqueado** (en web, `expo-camera` siempre devuelve `canAskAgain: true`), **notificación recibida** (no hay notificaciones locales en web) y el **diálogo del sistema con el texto de propósito** (requiere una development build).
 
-| Escáner: cargando | Escáner: concedido | Escáner: preguntable | Escáner: bloqueado |
+| Inicio | Escáner: cargando | Escáner: preguntable | Escáner: concedido |
 |---|---|---|---|
-| ![](docs/capturas/escaner-cargando.png) | ![](docs/capturas/escaner-concedido.png) | ![](docs/capturas/escaner-preguntable.png) | ![](docs/capturas/escaner-bloqueado.png) |
+| ![](docs/capturas/inicio-con-reporte.png) | ![](docs/capturas/escaner-cargando.png) | ![](docs/capturas/escaner-preguntable.png) | ![](docs/capturas/escaner-concedido.png) |
 
-| Ubicación concedida | Ubicación denegada | Foto desde el selector | Notificación recibida |
+| Pantalla previa (modal) | Ubicación concedida | Ubicación denegada → sector a mano | Foto desde el selector |
 |---|---|---|---|
-| ![](docs/capturas/ubicacion-concedida.png) | ![](docs/capturas/ubicacion-denegada.png) | ![](docs/capturas/foto-selector.png) | ![](docs/capturas/notificacion.png) |
+| ![](docs/capturas/pantalla-previa-ubicacion.png) | ![](docs/capturas/ubicacion-concedida.png) | ![](docs/capturas/ubicacion-denegada.png) | ![](docs/capturas/foto-selector.png) |
 
-| Panel antes de Ajustes | Panel después de Ajustes | Diálogo con texto de propósito (dev build) |
-|---|---|---|
-| ![](docs/capturas/panel-antes.png) | ![](docs/capturas/panel-despues.png) | ![](docs/capturas/dialogo-dev-build.png) |
+| Reporte resuelto (sin notificaciones) | Bandeja de avisos | Panel antes de Ajustes | Panel después de Ajustes |
+|---|---|---|---|
+| ![](docs/capturas/reporte-resuelto.png) | ![](docs/capturas/avisos.png) | ![](docs/capturas/panel-antes.png) | ![](docs/capturas/panel-despues.png) |
 
 ## Notas para la defensa
 

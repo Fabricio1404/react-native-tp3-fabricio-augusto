@@ -5,7 +5,7 @@ import { AZUL } from '@/components/ui';
 import { useStore } from '@/lib/store';
 
 function Icono({ simbolo, color }: { simbolo: string; color: ColorValue }) {
-  return <Text style={{ fontSize: 20, color }}>{simbolo}</Text>;
+  return <Text style={{ fontSize: 18, lineHeight: 22, color }}>{simbolo}</Text>;
 }
 
 export default function TabsLayout() {
