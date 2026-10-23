@@ -6,10 +6,11 @@
 import { Camera } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
-import * as Notifications from 'expo-notifications';
+import type { NotificationPermissionsStatus } from 'expo-notifications';
 import { Platform } from 'react-native';
 
-import { asegurarCanal } from '@/lib/notificaciones';
+import { asegurarCanal, IOS_PROVISIONAL } from '@/lib/notificaciones';
+import { Notifications } from '@/lib/notificaciones-modulo';
 
 export type Recurso = 'camara' | 'ubicacion' | 'notificaciones' | 'fotos';
 export type EstadoPermiso = 'cargando' | 'concedido' | 'preguntable' | 'bloqueado';
@@ -65,18 +66,22 @@ function normalizarFotos(r: ImagePicker.MediaLibraryPermissionResponse): Respues
   };
 }
 
-const NOMBRES_IOS: Record<number, string> = {
-  [Notifications.IosAuthorizationStatus.NOT_DETERMINED]: 'NOT_DETERMINED',
-  [Notifications.IosAuthorizationStatus.DENIED]: 'DENIED',
-  [Notifications.IosAuthorizationStatus.AUTHORIZED]: 'AUTHORIZED',
-  [Notifications.IosAuthorizationStatus.PROVISIONAL]: 'PROVISIONAL',
-  [Notifications.IosAuthorizationStatus.EPHEMERAL]: 'EPHEMERAL',
+// Valores de IosAuthorizationStatus de expo-notifications.
+const NOMBRES_IOS = ['NOT_DETERMINED', 'DENIED', 'AUTHORIZED', 'PROVISIONAL', 'EPHEMERAL'];
+
+/** Sin el módulo nativo no hay notificaciones del sistema: queda la bandeja /avisos. */
+const SIN_NOTIFICACIONES: Respuesta = {
+  status: 'denied',
+  granted: false,
+  canAskAgain: false,
+  parcial: false,
+  matiz: 'No disponibles en esta versión de la app: los avisos llegan a la bandeja.',
 };
 
-function normalizarNotificaciones(r: Notifications.NotificationPermissionsStatus): Respuesta {
+function normalizarNotificaciones(r: NotificationPermissionsStatus): Respuesta {
   // En iOS hay que mirar ios.status: las provisionales llegan sin diálogo
   // y van directo al Centro de notificaciones.
-  const provisional = r.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL;
+  const provisional = r.ios?.status === IOS_PROVISIONAL;
   return {
     ...base(r),
     granted: r.granted || provisional,
@@ -96,8 +101,10 @@ export const FUENTES: Record<Recurso, Fuente> = {
     pedir: async () => normalizarUbicacion(await Location.requestForegroundPermissionsAsync()),
   },
   notificaciones: {
-    consultar: async () => normalizarNotificaciones(await Notifications.getPermissionsAsync()),
+    consultar: async () =>
+      Notifications ? normalizarNotificaciones(await Notifications.getPermissionsAsync()) : SIN_NOTIFICACIONES,
     pedir: async () => {
+      if (!Notifications) return SIN_NOTIFICACIONES;
       // Android 13+: sin un canal creado, el diálogo de POST_NOTIFICATIONS no aparece.
       await asegurarCanal();
       return normalizarNotificaciones(await Notifications.requestPermissionsAsync());

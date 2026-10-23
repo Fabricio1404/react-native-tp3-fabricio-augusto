@@ -6,6 +6,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Boton, Pantalla, Tarjeta } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { useConPermiso } from '@/hooks/useConPermiso';
+import { notificacionesDisponibles } from '@/lib/notificaciones-modulo';
 import { setAvisarResolucion, useStore } from '@/lib/store';
 
 /**
@@ -20,6 +21,7 @@ export default function AjustesApp() {
   const activo = avisar && permiso.estado === 'concedido';
 
   const cambiar = (valor: boolean) => {
+    if (!notificacionesDisponibles) return;
     if (valor) permiso.ejecutar();
     else setAvisarResolucion(false);
   };
@@ -36,7 +38,16 @@ export default function AjustesApp() {
         </ThemedText>
       </Tarjeta>
 
-      {avisar && permiso.estado === 'bloqueado' && (
+      {!notificacionesDisponibles && (
+        <Tarjeta>
+          <ThemedText type="small">
+            Esta versión de la app no puede mostrar notificaciones del sistema. Los avisos te
+            llegan a la pestaña Avisos.
+          </ThemedText>
+        </Tarjeta>
+      )}
+
+      {notificacionesDisponibles && avisar && permiso.estado === 'bloqueado' && (
         <Tarjeta>
           <ThemedText type="small">
             Las notificaciones están desactivadas en los Ajustes del teléfono, así que por ahora

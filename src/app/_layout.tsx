@@ -1,16 +1,17 @@
-import * as Notifications from 'expo-notifications';
 import { DarkTheme, DefaultTheme, router, Stack, ThemeProvider } from 'expo-router';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 
 // Registra el handler de notificaciones en primer plano.
 import '@/lib/notificaciones';
+import { Notifications } from '@/lib/notificaciones-modulo';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   // Al tocar la notificación "Reporte resuelto", abrir ese reporte.
   useEffect(() => {
+    if (!Notifications) return;
     const sub = Notifications.addNotificationResponseReceivedListener((respuesta) => {
       const url = respuesta.notification.request.content.data?.url;
       if (typeof url === 'string') router.push(url as never);

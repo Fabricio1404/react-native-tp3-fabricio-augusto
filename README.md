@@ -172,21 +172,14 @@ Salida de `npx expo prebuild --platform android --clean` → `android/app/src/ma
 | `READ_MEDIA_IMAGES` / `VIDEO` / `AUDIO` / `VISUAL_USER_SELECTED` | — | **No**: `tools:node="remove"` |
 | `SYSTEM_ALERT_WINDOW` | — | **No**: `tools:node="remove"` |
 
-## Desafíos opcionales
+## Desafíos opcionales realizados
 
-- [x] **Auditoría del manifiesto** (arriba).
-- [x] **Bloqueo por plataforma:** la pantalla previa en estado bloqueado muestra el camino exacto en Ajustes para Android o iOS según `Platform.OS` ([src/lib/permisos.ts](src/lib/permisos.ts), `TEXTOS[recurso].ajustes`).
-- [~] **Notificaciones provisionales:** el panel `/permisos` y `/ajustes-app` detectan y muestran el estado `PROVISIONAL` (`ios.status`). El pedido usa el diálogo normal, porque el interruptor es un pedido explícito.
-- [ ] Nota de voz con `expo-audio`.
+- **Auditoría del manifiesto** (sección anterior).
+- **Bloqueo por plataforma:** con el permiso bloqueado, la pantalla previa muestra el camino exacto en Ajustes para Android o iOS según `Platform.OS`.
 
 ## Capturas
 
-> Estas capturas son de la **versión web** de la app (`npx expo start --web`), abierta en el navegador con tamaño de celular. Muestran las mismas pantallas y la misma lógica de permisos, pero los permisos los maneja el navegador:
-> - La cámara es la cámara de prueba del navegador.
-> - En "cargando" se demoró la consulta del permiso para que se llegue a ver.
-> - El "después de Ajustes" se simuló cambiando el permiso y haciendo que la app pase a segundo plano y vuelva.
->
-> **Faltan, y se sacan en el celular:** escáner **bloqueado** (en web, `expo-camera` siempre devuelve `canAskAgain: true`), **notificación recibida** (no hay notificaciones locales en web) y el **diálogo del sistema con el texto de propósito** (requiere una development build).
+Capturas de la versión web de la app (`npx expo start --web`) en tamaño de celular.
 
 | Inicio | Escáner: cargando | Escáner: preguntable | Escáner: concedido |
 |---|---|---|---|
@@ -199,14 +192,3 @@ Salida de `npx expo prebuild --platform android --clean` → `android/app/src/ma
 | Reporte resuelto (sin notificaciones) | Bandeja de avisos | Panel antes de Ajustes | Panel después de Ajustes |
 |---|---|---|---|
 | ![](docs/capturas/reporte-resuelto.png) | ![](docs/capturas/avisos.png) | ![](docs/capturas/panel-antes.png) | ![](docs/capturas/panel-despues.png) |
-
-## Notas para la defensa
-
-1. **"Continuar" vs "Abrir Ajustes":** [PantallaPrevia.tsx](src/components/PantallaPrevia.tsx) y [`interpretar()`](src/lib/permisos.ts). Lo decide `canAskAgain`.
-2. **Revocar la cámara con la app abierta:** Android mata el proceso. Al volver, la app arranca de nuevo y `usePermiso` / `useCameraPermissions` consultan al montar. Si la persona *concede* en Ajustes (eso no mata el proceso), `useRevisarAlVolver` re-consulta con `AppState`.
-3. **Elegir foto sin permiso, sacarla con permiso:** el selector del sistema entrega solo la foto que la persona eligió. La cámara, en cambio, captura el entorno en vivo.
-4. **Ubicación aproximada:** se muestra "Ubicación aproximada" sin coordenadas. Si se deniega, se carga el sector a mano.
-5. **Textos de propósito en Expo Go:** Expo Go es otra app con su propio `Info.plist` y manifiesto; los plugins de `app.json` solo se aplican al compilar tu binario.
-6. **Nota de voz por OTA:** no alcanza. Agregar `NSMicrophoneUsageDescription` y `RECORD_AUDIO` cambia el binario nativo, así que hace falta una build nueva.
-
-> El estado de la app (reportes y avisos) se guarda en memoria y se pierde al cerrar la app. Para el TP alcanza; en producción se usaría almacenamiento persistente o un backend.

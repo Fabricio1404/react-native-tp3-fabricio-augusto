@@ -2,16 +2,18 @@
  * Notificaciones locales: canal de Android, presentación en primer plano y
  * la simulación de "reporte resuelto".
  */
-import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
+import { Notifications } from '@/lib/notificaciones-modulo';
 import { agregarAviso, cambiarEstadoReporte, getEstado } from '@/lib/store';
 
 export const CANAL = 'reportes';
+/** IosAuthorizationStatus.PROVISIONAL de expo-notifications. */
+export const IOS_PROVISIONAL = 3;
 const SEGUNDOS_RESOLUCION = 10;
 
 // Sin handler, una notificación que llega con la app abierta no se muestra.
-Notifications.setNotificationHandler({
+Notifications?.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowBanner: true,
     shouldShowList: true,
@@ -22,7 +24,7 @@ Notifications.setNotificationHandler({
 
 /** Android 8+ exige un canal; Android 13+ no muestra el diálogo de permiso hasta que existe uno. */
 export async function asegurarCanal() {
-  if (Platform.OS !== 'android') return;
+  if (Platform.OS !== 'android' || !Notifications) return;
   await Notifications.setNotificationChannelAsync(CANAL, {
     name: 'Estado de mis reportes',
     description: 'Avisos cuando un reporte cambia a resuelto',
@@ -51,21 +53,26 @@ export async function simularResolucion(reporteId: string): Promise<boolean> {
     agregarAviso({ reporteId, titulo, cuerpo });
   }, SEGUNDOS_RESOLUCION * 1000);
 
-  if (!getEstado().avisarResolucion) return false;
+  if (!getEstado().avisarResolucion || !Notifications) return false;
 
-  // Se consulta (no se pide): el permiso solo se pide desde /ajustes-app.
-  const permiso = await Notifications.getPermissionsAsync();
-  const provisional = permiso.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL;
-  if (!permiso.granted && !provisional) return false;
+  try {
+    // Se consulta (no se pide): el permiso solo se pide desde /ajustes-app.
+    const permiso = await Notifications.getPermissionsAsync();
+    const provisional = permiso.ios?.status === IOS_PROVISIONAL;
+    if (!permiso.granted && !provisional) return false;
 
-  await asegurarCanal();
-  await Notifications.scheduleNotificationAsync({
-    content: { title: titulo, body: cuerpo, data: { url: `/reporte/${reporteId}` } },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-      seconds: SEGUNDOS_RESOLUCION,
-      channelId: CANAL,
-    },
-  });
-  return true;
+    await asegurarCanal();
+    await Notifications.scheduleNotificationAsync({
+      content: { title: titulo, body: cuerpo, data: { url: `/reporte/${reporteId}` } },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: SEGUNDOS_RESOLUCION,
+        channelId: CANAL,
+      },
+    });
+    return true;
+  } catch {
+    // Si el sistema no deja programarla, el aviso igual llega a la bandeja.
+    return false;
+  }
 }
