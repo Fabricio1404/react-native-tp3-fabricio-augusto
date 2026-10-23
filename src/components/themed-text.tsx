@@ -25,6 +25,10 @@ export function ThemedText({ style, type = 'default', themeColor, ...rest }: The
         type === 'code' && styles.code,
         style,
       ]}
+      // Android: evita que algunos equipos corten la última palabra de una línea.
+      textBreakStrategy="simple"
+      // Con la fuente del sistema muy grande, el texto crece pero sin desbordar.
+      maxFontSizeMultiplier={1.4}
       {...rest}
     />
   );
@@ -33,23 +37,20 @@ export function ThemedText({ style, type = 'default', themeColor, ...rest }: The
 const styles = StyleSheet.create({
   small: {
     fontSize: 14,
-    lineHeight: 20,
     fontWeight: 500,
   },
   smallBold: {
     fontSize: 14,
-    lineHeight: 20,
     fontWeight: 700,
   },
   default: {
     fontSize: 16,
-    lineHeight: 24,
     fontWeight: 500,
   },
   title: {
     fontSize: 48,
     fontWeight: 600,
-    lineHeight: 52,
+    lineHeight: 58,
   },
   subtitle: {
     fontSize: 32,

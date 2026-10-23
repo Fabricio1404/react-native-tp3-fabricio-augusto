@@ -50,7 +50,7 @@ export function Boton({ titulo, onPress, variante = 'primario', deshabilitado, s
       disabled={deshabilitado}
       style={({ pressed }) => [
         styles.boton,
-        primario ? { backgroundColor: AZUL } : { backgroundColor: theme.backgroundElement },
+        primario ? { backgroundColor: AZUL } : { backgroundColor: theme.backgroundSelected },
         (pressed || deshabilitado) && { opacity: 0.6 },
         style,
       ]}>
@@ -110,7 +110,7 @@ export function Opciones<T extends string>({
             onPress={() => onChange(opcion)}
             style={[
               styles.opcion,
-              { backgroundColor: activa ? AZUL : theme.backgroundElement },
+              { backgroundColor: activa ? AZUL : theme.backgroundSelected },
             ]}>
             <ThemedText type="small" style={activa && { color: '#fff' }}>
               {opcion}
@@ -122,15 +122,20 @@ export function Opciones<T extends string>({
   );
 }
 
-export function Campo({ etiqueta, ...props }: TextInputProps & { etiqueta: string }) {
+export function Campo({ etiqueta, style, ...props }: TextInputProps & { etiqueta: string }) {
   const theme = useTheme();
   return (
     <View style={{ gap: Spacing.one }}>
       <ThemedText type="smallBold">{etiqueta}</ThemedText>
       <TextInput
         placeholderTextColor={theme.textSecondary}
-        style={[styles.input, { color: theme.text, backgroundColor: theme.backgroundElement }]}
+        maxFontSizeMultiplier={1.4}
         {...props}
+        style={[
+          styles.input,
+          { color: theme.text, backgroundColor: theme.backgroundSelected },
+          style,
+        ]}
       />
     </View>
   );
